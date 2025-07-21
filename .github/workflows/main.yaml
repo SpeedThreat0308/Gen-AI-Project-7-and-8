@@ -38,7 +38,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add space https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Tool_Agent || true
+          git remote add space https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Agent_Space || true
           git fetch space main
           git rebase space/main || {
             echo "Conflicts detected. Skipping conflicted commits...";
@@ -50,4 +50,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Tool_Agent main
+        run: git push --force https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Agent_Space main
