@@ -38,9 +38,9 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add space https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Agent_Space || true
-          git fetch space main
-          git rebase space/main || {
+          git remote add https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Agent_Space || true
+          git fetch main
+          git rebase main || {
             echo "Conflicts detected. Skipping conflicted commits...";
             while ! git rebase --continue 2>/dev/null; do
               git rebase --skip || break
