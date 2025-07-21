@@ -1,0 +1,53 @@
+name: Sync to Hugging Face hub
+
+on:
+  push:
+    branches: [main]
+
+  # to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Git user
+        run: |
+          git config --global user.email "thamizamuzhthu@gmail.com"
+          git config --global user.name "SpeedThreat0308"
+
+      - name: Install Git LFS and track PDFs
+        run: |
+          git lfs install
+          git lfs track "*.pdf"
+          git add .gitattributes
+          git commit -m "Configure Git LFS for PDF files" || true
+
+      - name: Remove previously committed PDFs and re-add with LFS
+        run: |
+          git rm --cached temp/*.pdf || true
+          git add temp/*.pdf || true
+          git commit -m "Re-add PDF files with LFS tracking" || true
+
+      - name: Pull latest from Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git remote add space https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Tool_Agent || true
+          git fetch space main
+          git rebase space/main || {
+            echo "Conflicts detected. Skipping conflicted commits...";
+            while ! git rebase --continue 2>/dev/null; do
+              git rebase --skip || break
+            done
+          }
+
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: git push --force https://HuggingGen:$HF_TOKEN@huggingface.co/spaces/HuggingGen/Multi_Tool_Agent main
